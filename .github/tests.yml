@@ -1,0 +1,85 @@
+name: "PHPUnit/PHPStan"
+
+on:
+  push:
+    branches:
+      - "develop/*"
+  pull_request:
+    branches:
+
+permissions:
+  contents: "read"
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  unit_tests:
+    name: "Unit and functional tests"
+    env:
+      APP_ENV: test
+    services:
+    strategy:
+      #fail-fast: false
+      matrix:
+        php-version:
+          - "8.2"
+          - "8.3"
+          - "8.4"
+    runs-on: "ubuntu-latest"
+    steps:
+      -   name: "Set up PHP"
+          uses: "shivammathur/setup-php@v2"
+          with:
+            php-version: "${{ matrix.php-version }}"
+
+      -   name: "Checkout code"
+          uses: "actions/checkout@v4"
+
+      -   name: "Install dependencies"
+          uses: "ramsey/composer-install@v3"
+
+      -   name: "Execute unit tests"
+          run: "vendor/bin/phpunit --testdox"
+
+  static_analysis:
+    name: "Static Analysis"
+    strategy:
+      #fail-fast: false
+      matrix:
+        php-version:
+          - "8.2"
+          - "8.3"
+          - "8.4"
+    runs-on: "ubuntu-latest"
+    env:
+      APP_ENV: test
+    steps:
+      -   name: "Set up PHP"
+          uses: "shivammathur/setup-php@v2"
+          with:
+            php-version: "${{ matrix.php-version }}"
+            coverage: "none"
+
+      -   name: "Checkout code"
+          uses: "actions/checkout@v3"
+
+      -   name: "Check JSON files"
+          run: |
+            find . -type f -name '*.json' | xargs -t -L 1 -- php -r 'json_decode(file_get_contents($argv[1]), null, 512, JSON_THROW_ON_ERROR);'
+
+      -   name: "Validate Composer configuration"
+          run: "composer validate --no-interaction"
+
+      -   name: "Install dependencies"
+          uses: "ramsey/composer-install@v3"
+
+      -   name: "Check PSR-4 mapping"
+          run: "composer dump-autoload --no-interaction --optimize --strict-psr"
+
+      -   name: "Perform static analysis"
+          run: "vendor/bin/phpstan analyse src tests -c phpstan.neon -l 9"
+
+      -   name: "Code Style Check"
+          run: "vendor/bin/php-cs-fixer check src --rules=@Symfony"

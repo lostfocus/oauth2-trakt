@@ -1,18 +1,25 @@
 <?php namespace Lostfocus\OAuth2\Client\Test\Provider;
 
-use Mockery as m;
+use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Exception\GuzzleException;
+use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
+use Lostfocus\OAuth2\Client\Provider\Trakt;
+use PHPUnit\Framework\MockObject\Exception;
+use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamInterface;
+use Random\RandomException;
 
-class TraktTest extends \PHPUnit_Framework_TestCase
+class TraktTest extends TestCase
 {
-    protected $provider;
+    protected Trakt $provider;
 
-    public function tearDown()
+    public function tearDown(): void
     {
-        m::close();
         parent::tearDown();
     }
 
-    public function testAuthorizationUrl()
+    public function testAuthorizationUrl(): void
     {
         $url = $this->provider->getAuthorizationUrl();
         $uri = parse_url($url);
@@ -25,7 +32,7 @@ class TraktTest extends \PHPUnit_Framework_TestCase
         $this->assertNotNull($this->provider->getState());
     }
 
-    public function testGetAuthorizationUrl()
+    public function testGetAuthorizationUrl(): void
     {
         $url = $this->provider->getAuthorizationUrl();
         $uri = parse_url($url);
@@ -33,7 +40,7 @@ class TraktTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/oauth/authorize', $uri['path']);
     }
 
-    public function testGetBaseAccessTokenUrl()
+    public function testGetBaseAccessTokenUrl(): void
     {
         $params = [];
 
@@ -43,17 +50,24 @@ class TraktTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/oauth/token', $uri['path']);
     }
 
-    public function testGetAccessToken()
+    /**
+     * @throws GuzzleException
+     * @throws IdentityProviderException
+     * @throws Exception
+     */
+    public function testGetAccessToken(): void
     {
-        $response = m::mock('Psr\Http\Message\ResponseInterface');
-        $response->shouldReceive('getBody')->andReturn(
+        $response = $this->createMock(ResponseInterface::class);
+        $responseBody = $this->createMock(StreamInterface::class);
+        $responseBody->method('__toString')->willReturn(
             '{"access_token": "mock_access_token","token_type": "bearer","expires_in": 3600,"refresh_token": "mock_refresh_token","scope": "public","created_at": '.
             time().'}'
         );
-        $response->shouldReceive('getHeader')->andReturn(['content-type' => 'application/json']);
+        $response->method('getBody')->willReturn($responseBody);
+        $response->method('getHeader')->willReturn(['content-type' => 'application/json']);
 
-        $client = m::mock('GuzzleHttp\ClientInterface');
-        $client->shouldReceive('send')->times(1)->andReturn($response);
+        $client = $this->createMock(ClientInterface::class);
+        $client->expects($this->once())->method('send')->willReturn($response);
         $this->provider->setHttpClient($client);
 
         $token = $this->provider->getAccessToken('authorization_code', ['code' => 'mock_authorization_code']);
@@ -65,28 +79,42 @@ class TraktTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($token->getResourceOwnerId());
     }
 
-    public function testUserData()
+    /**
+     * @noinspection PhpPossiblePolymorphicInvocationInspection
+     * @throws GuzzleException
+     * @throws IdentityProviderException
+     * @throws Exception
+     * @throws RandomException
+     */
+    public function testUserData(): void
     {
-        $username = uniqid();
-        $name = uniqid();
-        $avatarUrl = uniqid();
-        $id = rand(1000, 9999);
+        $username = uniqid('', true);
+        $name = uniqid('', true);
+        $avatarUrl = uniqid('', true);
+        $id = random_int(1000, 9999);
 
-        $postResponse = m::mock('Psr\Http\Message\ResponseInterface');
-        $postResponse->shouldReceive('getBody')->andReturn(
-            '{"access_token":"mock_access_token","authentication_token":"","code":"","expires_in":3600,"refresh_token":"mock_refresh_token","scope":"","state":"","token_type":""}'
-        );
-        $postResponse->shouldReceive('getHeader')->andReturn(['content-type' => 'json']);
+        $postResponse = $this->createMock(ResponseInterface::class);
 
-        $userResponse = m::mock('Psr\Http\Message\ResponseInterface');
-        $userResponse->shouldReceive('getBody')->andReturn(
+        $responseBody = $this->createMock(StreamInterface::class);
+        $responseBody->method('__toString')->willReturn(
+            '{"access_token":"mock_access_token","authentication_token":"","code":"","expires_in":3600,"refresh_token":"mock_refresh_token","scope":"","state":"","token_type":""}'        );
+
+
+        $postResponse->method('getBody')->willReturn($responseBody);
+        $postResponse->method('getHeader')->willReturn(['content-type' => 'json']);
+
+        $userResponseBody = $this->createMock(StreamInterface::class);
+        $userResponseBody->method('__toString')->willReturn(
             '{"user": {"username": "'.$username.'","name": "'.$name.'","ids": {"slug": "'.$id.
             '"},"images": {"avatar": {"full": "'.$avatarUrl.'"}}}}'
         );
-        $userResponse->shouldReceive('getHeader')->andReturn(['content-type' => 'application/json']);
 
-        $client = m::mock('GuzzleHttp\ClientInterface');
-        $client->shouldReceive('send')->times(2)->andReturn($postResponse, $userResponse);
+        $userResponse = $this->createMock(ResponseInterface::class);
+        $userResponse->method('getBody')->willReturn($userResponseBody);
+        $userResponse->method('getHeader')->willReturn(['content-type' => 'application/json']);
+
+        $client = $this->createMock(ClientInterface::class);
+        $client->expects($this->atLeast(2))->method('send')->willReturn($postResponse, $userResponse);
         $this->provider->setHttpClient($client);
 
         $token = $this->provider->getAccessToken('authorization_code', ['code' => 'mock_authorization_code']);
@@ -103,29 +131,34 @@ class TraktTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException League\OAuth2\Client\Provider\Exception\IdentityProviderException
-     **/
-    public function testExceptionThrownWhenErrorObjectReceived()
+     * @throws GuzzleException
+     * @throws Exception
+     */
+    public function testExceptionThrownWhenErrorObjectReceived(): void
     {
-        $message = uniqid();
+        $this->expectException(IdentityProviderException::class);
+        $message = uniqid('', true);
 
-        $postResponse = m::mock('Psr\Http\Message\ResponseInterface');
-        $postResponse->shouldReceive('getBody')->andReturn(
+        $responseBody = $this->createMock(StreamInterface::class);
+        $responseBody->method('__toString')->willReturn(
             '{"error": {"code": "request_token_expired", "message": "'.$message.'"}}'
         );
-        $postResponse->shouldReceive('getHeader')->andReturn(['content-type' => 'application/json']);
-        $postResponse->shouldReceive('getStatusCode')->andReturn(500);
 
-        $client = m::mock('GuzzleHttp\ClientInterface');
-        $client->shouldReceive('send')->times(1)->andReturn($postResponse);
+        $postResponse = $this->createMock(ResponseInterface::class);
+        $postResponse->method('getBody')->willReturn($responseBody);
+        $postResponse->method('getHeader')->willReturn(['content-type' => 'application/json']);
+        $postResponse->method('getStatusCode')->willReturn(500);
+
+        $client = $this->createMock(ClientInterface::class);
+        $client->expects($this->once())->method('send')->willReturn($postResponse);
         $this->provider->setHttpClient($client);
 
-        $token = $this->provider->getAccessToken('authorization_code', ['code' => 'mock_authorization_code']);
+        $this->provider->getAccessToken('authorization_code', ['code' => 'mock_authorization_code']);
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->provider = new \Bogstag\OAuth2\Client\Provider\Trakt(
+        $this->provider = new Trakt(
             [
                 'clientId' => 'mock_client_id',
                 'clientSecret' => 'mock_secret',

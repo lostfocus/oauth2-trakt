@@ -1,10 +1,5 @@
 # trakt.tv Provider for OAuth 2.0 Client
-[![Latest Version](https://img.shields.io/github/release/bogstag/oauth2-trakt.svg?style=flat-square)](https://github.com/bogstag/oauth2-trakt/releases)
-[![Build Status](https://img.shields.io/travis/Bogstag/oauth2-trakt/master.svg?style=flat-square)](https://travis-ci.org/Bogstag/oauth2-trakt)
-[![Coverage Status](https://img.shields.io/scrutinizer/coverage/g/bogstag/oauth2-trakt.svg?style=flat-square)](https://scrutinizer-ci.com/g/bogstag/oauth2-trakt/code-structure)
-[![Quality Score](https://img.shields.io/scrutinizer/g/bogstag/oauth2-trakt.svg?style=flat-square)](https://scrutinizer-ci.com/g/bogstag/oauth2-trakt)
-[![StyleCI](https://styleci.io/repos/83116136/shield?branch=master&style=flat)](https://styleci.io/repos/83116136)
-[![Total Downloads](https://img.shields.io/packagist/dt/bogstag/oauth2-trakt.svg?style=flat-square)](https://packagist.org/packages/bogstag/oauth2-trakt)
+[![Latest Version](https://img.shields.io/github/release/bogstag/oauth2-trakt.svg?style=flat-square)](https://github.com/lostfocus/oauth2-trakt/releases)
 [![Software License](https://img.shields.io/packagist/l/bogstag/oauth2-trakt.svg?style=flat-square)](https://packagist.org/packages/bogstag/oauth2-trakt)
 
 This package provides trakt.tv OAuth 2.0 support for the PHP League's [OAuth 2.0 Client](https://github.com/thephpleague/oauth2-client).

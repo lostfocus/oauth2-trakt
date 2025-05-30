@@ -3,7 +3,9 @@
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
+use League\OAuth2\Client\Token\AccessToken;
 use Lostfocus\OAuth2\Client\Provider\Trakt;
+use Lostfocus\OAuth2\Client\Provider\TraktResourceOwner;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
@@ -23,19 +25,27 @@ class TraktTest extends TestCase
     {
         $url = $this->provider->getAuthorizationUrl();
         $uri = parse_url($url);
+
+        $this->assertIsArray($uri);
+        $this->assertArrayHasKey('query', $uri);
+        assert(array_key_exists('query', $uri));
+
         parse_str($uri['query'], $query);
 
         $this->assertArrayHasKey('client_id', $query);
         $this->assertArrayHasKey('redirect_uri', $query);
         $this->assertArrayHasKey('state', $query);
         $this->assertArrayHasKey('response_type', $query);
-        $this->assertNotNull($this->provider->getState());
     }
 
     public function testGetAuthorizationUrl(): void
     {
         $url = $this->provider->getAuthorizationUrl();
         $uri = parse_url($url);
+
+        $this->assertIsArray($uri);
+        $this->assertArrayHasKey('path', $uri);
+        assert(array_key_exists('path', $uri));
 
         $this->assertEquals('/oauth/authorize', $uri['path']);
     }
@@ -46,6 +56,10 @@ class TraktTest extends TestCase
 
         $url = $this->provider->getBaseAccessTokenUrl($params);
         $uri = parse_url($url);
+
+        $this->assertIsArray($uri);
+        $this->assertArrayHasKey('path', $uri);
+        assert(array_key_exists('path', $uri));
 
         $this->assertEquals('/oauth/token', $uri['path']);
     }
@@ -71,6 +85,7 @@ class TraktTest extends TestCase
         $this->provider->setHttpClient($client);
 
         $token = $this->provider->getAccessToken('authorization_code', ['code' => 'mock_authorization_code']);
+        $this->assertInstanceOf(AccessToken::class, $token);
 
         $this->assertEquals('mock_access_token', $token->getToken());
         $this->assertLessThanOrEqual(time() + 3600, $token->getExpires());
@@ -80,7 +95,6 @@ class TraktTest extends TestCase
     }
 
     /**
-     * @noinspection PhpPossiblePolymorphicInvocationInspection
      * @throws GuzzleException
      * @throws IdentityProviderException
      * @throws Exception
@@ -118,7 +132,10 @@ class TraktTest extends TestCase
         $this->provider->setHttpClient($client);
 
         $token = $this->provider->getAccessToken('authorization_code', ['code' => 'mock_authorization_code']);
+        $this->assertInstanceOf(AccessToken::class, $token);
         $user = $this->provider->getResourceOwner($token);
+
+        $this->assertInstanceOf(TraktResourceOwner::class, $user);
 
         $this->assertEquals($username, $user->getUsername());
         $this->assertEquals($username, $user->toArray()['user']['username']);

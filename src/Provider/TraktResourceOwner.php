@@ -17,7 +17,7 @@ class TraktResourceOwner implements ResourceOwnerInterface
     /**
      * Creates new resource owner.
      *
-     * @param array $response
+     * @param  array  $response
      */
     public function __construct(array $response = [])
     {
@@ -31,7 +31,12 @@ class TraktResourceOwner implements ResourceOwnerInterface
      */
     public function getUsername(): ?string
     {
-        return $this->getValueByKey($this->response, 'user.username');
+        $username = $this->getValueByKey($this->response, 'user.username');
+        if (!is_string($username)) {
+            return null;
+        }
+
+        return $username;
     }
 
     /**
@@ -41,7 +46,12 @@ class TraktResourceOwner implements ResourceOwnerInterface
      */
     public function getName(): ?string
     {
-        return $this->getValueByKey($this->response, 'user.name');
+        $name = $this->getValueByKey($this->response, 'user.name');
+        if (!is_string($name)) {
+            return null;
+        }
+
+        return $name;
     }
 
     /**
@@ -51,7 +61,12 @@ class TraktResourceOwner implements ResourceOwnerInterface
      */
     public function getAvatarUrl(): ?string
     {
-        return $this->getValueByKey($this->response, 'user.images.avatar.full');
+        $avatarUrl = $this->getValueByKey($this->response, 'user.images.avatar.full');
+        if (!is_string($avatarUrl)) {
+            return null;
+        }
+
+        return $avatarUrl;
     }
 
     /**
@@ -61,7 +76,12 @@ class TraktResourceOwner implements ResourceOwnerInterface
      */
     public function getId(): ?string
     {
-        return $this->getValueByKey($this->response, 'user.ids.slug');
+        $id = $this->getValueByKey($this->response, 'user.ids.slug');
+        if (!is_string($id)) {
+            return null;
+        }
+
+        return $id;
     }
 
     /**

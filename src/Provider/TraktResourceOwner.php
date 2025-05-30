@@ -12,7 +12,7 @@ class TraktResourceOwner implements ResourceOwnerInterface
      *
      * @var array
      */
-    protected $response;
+    protected array $response = [];
 
     /**
      * Creates new resource owner.
@@ -29,7 +29,7 @@ class TraktResourceOwner implements ResourceOwnerInterface
      *
      * @return string|null
      */
-    public function getUsername()
+    public function getUsername(): ?string
     {
         return $this->getValueByKey($this->response, 'user.username');
     }
@@ -39,7 +39,7 @@ class TraktResourceOwner implements ResourceOwnerInterface
      *
      * @return string|null
      */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->getValueByKey($this->response, 'user.name');
     }
@@ -49,7 +49,7 @@ class TraktResourceOwner implements ResourceOwnerInterface
      *
      * @return string|null
      */
-    public function getAvatarUrl()
+    public function getAvatarUrl(): ?string
     {
         return $this->getValueByKey($this->response, 'user.images.avatar.full');
     }
@@ -59,7 +59,7 @@ class TraktResourceOwner implements ResourceOwnerInterface
      *
      * @return string|null
      */
-    public function getId()
+    public function getId(): ?string
     {
         return $this->getValueByKey($this->response, 'user.ids.slug');
     }
@@ -69,7 +69,7 @@ class TraktResourceOwner implements ResourceOwnerInterface
      *
      * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         return $this->response;
     }

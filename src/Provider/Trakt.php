@@ -17,17 +17,17 @@ class Trakt extends AbstractProvider
     /**
      * @var string
      */
-    protected $baseUrlApi = 'https://api.trakt.tv';
+    protected string $baseUrlApi = 'https://api.trakt.tv';
 
     /**
      * @var string
      */
-    protected $baseUrl = 'https://trakt.tv';
+    protected string $baseUrl = 'https://trakt.tv';
 
     /**
      * @var int
      */
-    protected $traktApiVersion = 2;
+    protected int $traktApiVersion = 2;
 
     /**
      * Get authorization url to begin OAuth flow
@@ -35,7 +35,7 @@ class Trakt extends AbstractProvider
      *
      * @return string
      */
-    public function getBaseAuthorizationUrl()
+    public function getBaseAuthorizationUrl(): string
     {
         return $this->baseUrl.'/oauth/authorize';
     }
@@ -43,7 +43,7 @@ class Trakt extends AbstractProvider
     /**
      * @inheritDoc
      */
-    public function getBaseAccessTokenUrl(array $params)
+    public function getBaseAccessTokenUrl(array $params): string
     {
         return $this->baseUrlApi.'/oauth/token';
     }
@@ -51,7 +51,7 @@ class Trakt extends AbstractProvider
     /**
      * @inheritDoc
      */
-    public function getResourceOwnerDetailsUrl(AccessToken $token)
+    public function getResourceOwnerDetailsUrl(AccessToken $token): string
     {
         return $this->baseUrlApi.'/users/settings';
     }
@@ -59,7 +59,7 @@ class Trakt extends AbstractProvider
     /**
      * @inheritDoc
      */
-    public function getHeaders($token = null)
+    public function getHeaders($token = null): array
     {
         $headers = [];
         if ($token) {
@@ -76,7 +76,7 @@ class Trakt extends AbstractProvider
     /**
      * @inheritDoc
      */
-    protected function getDefaultScopes()
+    protected function getDefaultScopes(): array
     {
         return [];
     }
@@ -84,11 +84,11 @@ class Trakt extends AbstractProvider
     /**
      * @inheritDoc
      */
-    protected function checkResponse(ResponseInterface $response, $data)
+    protected function checkResponse(ResponseInterface $response, $data): void
     {
         if (isset($data['error'])) {
             throw new IdentityProviderException(
-                (isset($data['error']['message']) ? $data['error']['message'] : $response->getReasonPhrase()),
+                ($data['error']['error_message'] ?? $data['error']['message'] ?? $response->getReasonPhrase()),
                 $response->getStatusCode(),
                 $data
             );
@@ -98,7 +98,7 @@ class Trakt extends AbstractProvider
     /**
      * @inheritDoc
      */
-    protected function createResourceOwner(array $response, AccessToken $token)
+    protected function createResourceOwner(array $response, AccessToken $token): TraktResourceOwner
     {
         return new TraktResourceOwner($response);
     }

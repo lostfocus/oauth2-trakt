@@ -37,7 +37,7 @@ class Trakt extends AbstractProvider
      */
     public function getBaseAuthorizationUrl(): string
     {
-        return $this->baseUrl.'/oauth/authorize';
+        return $this->baseUrl . '/oauth/authorize';
     }
 
     /**
@@ -45,7 +45,7 @@ class Trakt extends AbstractProvider
      */
     public function getBaseAccessTokenUrl(array $params): string
     {
-        return $this->baseUrlApi.'/oauth/token';
+        return $this->baseUrlApi . '/oauth/token';
     }
 
     /**
@@ -53,7 +53,7 @@ class Trakt extends AbstractProvider
      */
     public function getResourceOwnerDetailsUrl(AccessToken $token): string
     {
-        return $this->baseUrlApi.'/users/settings';
+        return $this->baseUrlApi . '/users/settings';
     }
 
     /**
@@ -64,9 +64,9 @@ class Trakt extends AbstractProvider
         $headers = [];
         if ($token) {
             $headers = [
-                'Content-Type'      => 'application/json',
+                'Content-Type' => 'application/json',
                 'trakt-api-version' => $this->traktApiVersion,
-                'trakt-api-key'     => $this->clientId
+                'trakt-api-key' => $this->clientId
             ];
         }
 

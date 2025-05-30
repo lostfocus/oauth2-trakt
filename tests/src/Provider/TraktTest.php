@@ -74,8 +74,8 @@ class TraktTest extends TestCase
         $response = $this->createMock(ResponseInterface::class);
         $responseBody = $this->createMock(StreamInterface::class);
         $responseBody->method('__toString')->willReturn(
-            '{"access_token": "mock_access_token","token_type": "bearer","expires_in": 3600,"refresh_token": "mock_refresh_token","scope": "public","created_at": '.
-            time().'}'
+            '{"access_token": "mock_access_token","token_type": "bearer","expires_in": 3600,"refresh_token": "mock_refresh_token","scope": "public","created_at": ' .
+            time() . '}'
         );
         $response->method('getBody')->willReturn($responseBody);
         $response->method('getHeader')->willReturn(['content-type' => 'application/json']);
@@ -111,7 +111,7 @@ class TraktTest extends TestCase
 
         $responseBody = $this->createMock(StreamInterface::class);
         $responseBody->method('__toString')->willReturn(
-            '{"access_token":"mock_access_token","authentication_token":"","code":"","expires_in":3600,"refresh_token":"mock_refresh_token","scope":"","state":"","token_type":""}'        );
+            '{"access_token":"mock_access_token","authentication_token":"","code":"","expires_in":3600,"refresh_token":"mock_refresh_token","scope":"","state":"","token_type":""}');
 
 
         $postResponse->method('getBody')->willReturn($responseBody);
@@ -119,8 +119,8 @@ class TraktTest extends TestCase
 
         $userResponseBody = $this->createMock(StreamInterface::class);
         $userResponseBody->method('__toString')->willReturn(
-            '{"user": {"username": "'.$username.'","name": "'.$name.'","ids": {"slug": "'.$id.
-            '"},"images": {"avatar": {"full": "'.$avatarUrl.'"}}}}'
+            '{"user": {"username": "' . $username . '","name": "' . $name . '","ids": {"slug": "' . $id .
+            '"},"images": {"avatar": {"full": "' . $avatarUrl . '"}}}}'
         );
 
         $userResponse = $this->createMock(ResponseInterface::class);
@@ -158,7 +158,7 @@ class TraktTest extends TestCase
 
         $responseBody = $this->createMock(StreamInterface::class);
         $responseBody->method('__toString')->willReturn(
-            '{"error": {"code": "request_token_expired", "message": "'.$message.'"}}'
+            '{"error": {"code": "request_token_expired", "message": "' . $message . '"}}'
         );
 
         $postResponse = $this->createMock(ResponseInterface::class);

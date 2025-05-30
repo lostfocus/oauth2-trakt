@@ -19,7 +19,6 @@ jobs:
     name: "Unit and functional tests"
     env:
       APP_ENV: test
-    services:
     strategy:
       #fail-fast: false
       matrix:

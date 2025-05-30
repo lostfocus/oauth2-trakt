@@ -1,4 +1,4 @@
-<?php namespace Bogstag\OAuth2\Client\Test\Provider;
+<?php namespace Lostfocus\OAuth2\Client\Test\Provider;
 
 use Mockery as m;
 

@@ -1,9 +1,14 @@
 {
-  "name": "bogstag/oauth2-trakt",
+  "name": "lostfocus/oauth2-trakt",
   "description": "trakt.tv OAuth 2.0 Client Provider for The PHP League OAuth2-Client",
   "type": "library",
   "license": "MIT",
   "authors": [
+    {
+      "name": "Dominik Schwind",
+      "email": "dschwind@lostfocus.de",
+      "homepage": "https://dominikschwind.com"
+    },
     {
       "name": "Bogstag",
       "email": "krister@bogstag.se",
@@ -30,12 +35,12 @@
   },
   "autoload": {
     "psr-4": {
-      "Bogstag\\OAuth2\\Client\\": "src/"
+      "Lostfocus\\OAuth2\\Client\\": "src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "Bogstag\\OAuth2\\Client\\Test\\": "tests/src/"
+      "Lostfocus\\OAuth2\\Client\\Test\\": "tests/src/"
     }
   }
 }

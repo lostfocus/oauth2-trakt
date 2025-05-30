@@ -3,7 +3,7 @@ name: "PHPUnit/PHPStan"
 on:
   push:
     branches:
-      - "develop/"
+      - "develop/fork-and-test"
   pull_request:
     branches:
 
